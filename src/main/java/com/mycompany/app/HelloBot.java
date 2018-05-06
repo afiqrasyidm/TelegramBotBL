@@ -7,33 +7,42 @@ import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class HelloBot extends AbilityBot {
-  public static String BOT_TOKEN = "599164260:AAGJcr3NdXBs8TsSng4_b_w_gHwkptD13II";
-  public static String BOT_USERNAME = "afiqbotbot";
+  private static Dotenv dotenv = Dotenv.configure().directory("./").ignoreIfMalformed().ignoreIfMissing().load();
 
   public HelloBot() {
-    super(BOT_TOKEN, BOT_USERNAME);
+    super(validToken(), validUsername());
   }
-
-
-
 
   public Ability sayHelloWorld() {
-      return Ability
-                .builder()
-                .name("hello")
-                .info("says hello world!")
-                .locality(ALL)
-                .privacy(PUBLIC)
-                .action(ctx -> silent.send("Hello world!", ctx.chatId()))
-                .build();
+    return Ability.builder().name("hello").info("says hello world!").locality(ALL).privacy(PUBLIC)
+        .action(ctx -> silent.send("Hello world!", ctx.chatId())).build();
   }
+
+  private static String validToken() {
+    String botToken = System.getenv().get("BOT_TOKEN");
+    if (botToken == null) {
+      return dotenv.get("BOT_TOKEN");
+    }
+    return botToken;
+  }
+
+  private static String validUsername() {
+    String botUsername = System.getenv().get("BOT_USERNAME");
+    if (botUsername == null) {
+      return dotenv.get("BOT_USERNAME");
+    }
+    return botUsername;
+  }
+
   @Override
-   public int creatorId() {
-     return 470958982;
-   }
-
-
+  public int creatorId() {
+    String creatorId = System.getenv().get("CREATOR_ID");
+    if(creatorId == null){
+      return Integer.parseInt(dotenv.get("CREATOR_ID"));
+    }
+    return Integer.parseInt(creatorId);
+  }
 }
