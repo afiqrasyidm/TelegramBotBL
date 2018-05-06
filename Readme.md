@@ -7,6 +7,10 @@ Untuk coba running:
 
 
 Untuk dokumentasi library yang lengkap:
-
+Ini pakai lib ability bots, udah langsung banyak yang automate, untuk detailnya bisa diliat:
 https://github.com/rubenlagus/TelegramBots/wiki/Simple-Example
 https://github.com/addo37/ExampleBots/tree/master/src/main/java/org/telegram/examplebots
+
+Kalau misal sekiranya butuh lib lainnya yang lebih bawah dari ability bots, liat di :
+
+https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/ , 
