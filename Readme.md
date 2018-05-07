@@ -13,4 +13,4 @@ https://github.com/addo37/ExampleBots/tree/master/src/main/java/org/telegram/exa
 
 Kalau misal sekiranya butuh lib lainnya yang lebih bawah dari ability bots, liat di :
 
-https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/ , 
+https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/ ,
