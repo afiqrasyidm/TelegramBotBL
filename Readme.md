@@ -26,8 +26,3 @@ https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/
 - jika mendapatkan error "org.javalite.activejdbc.InitException: you are trying to work with models, but no models are found", sebelum compile jalankan perintah "mvn process-classes" atau "mvn activejdbc-instrumentation:instrument"
 ## Documentation
 cara penggunaan dan dokumentasi dapat dilihat di http://javalite.io/activejdbc
-
-<<<<<<< HEAD
-https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/ ,
-=======
->>>>>>> f4af0a2040685abe8e29da8a2aa8122c163473ff
