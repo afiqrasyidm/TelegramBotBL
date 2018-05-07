@@ -1,29 +1,34 @@
 package com.mycompany.app;
 
-import org.telegram.abilitybots.api.objects.Ability;
-import org.telegram.telegrambots.api.objects.Update;
 import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.quartz.JobDetail;
+import org.quartz.Trigger;
+import org.telegram.abilitybots.api.objects.Ability;
 
-import com.mycompany.app.models.*;
+import java.util.Date;
+
+import com.mycompany.app.jobs.BroadcastJob;
 
 public class HelloBot extends BaseBot {
 
-  public HelloBot() {
+  public HelloBot() throws Exception {
     super();
   }
 
   public Ability sayHelloWorld() {
-    return Ability.builder().name("hello").info("says hello world!").locality(ALL).privacy(PUBLIC)
+    return Ability.builder().name("hello").info("says hello world!").locality(ALL).privacy(PUBLIC).input(1)
         .action(ctx -> {
-          // open connection to db
-          openDBConnection();
-          // create new user
-          new User().set("username","@vgeraldo").saveIt();
-          // close connection
-          closeDBConnection();
-
+          try {
+            JobDetail job = registerJob(BroadcastJob.class);
+            //\\ add params to job \\//
+            // job.getJobDataMap().put("MESSAGE", "Test");
+            // job.getJobDataMap().put("CHAT_IDS", new ArrayList<>());
+            Trigger trigger = registerTrigger(new Date());
+            queueJob(job, trigger);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
           silent.send("Hello world!", ctx.chatId());
         }).build();
   }

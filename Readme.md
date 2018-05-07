@@ -19,10 +19,3 @@ https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/
 - untuk menambahkan atau menghapus environment. Silahkan edit file .env
 - untuk penggunaan di local machine, seluruh environment database dan bot harus disesuaikan terlebih dahulu.
 
-# Java ORM using JDBC
-## How To Use
-- Pastikan bahwa table telah dibuat terlebih dahulu
-- kemudian buat Model class yang merepresentasikan table tersebut
-## Documentation
-cara penggunaan dan dokumentasi dapat dilihat di http://javalite.io/activejdbc
-
