@@ -23,6 +23,7 @@ https://monsterdeveloper.gitbooks.io/writing-telegram-bots-on-java/content/
 ## How To Use
 - Pastikan bahwa table telah dibuat terlebih dahulu
 - kemudian buat Model class yang merepresentasikan table tersebut
+- jika mendapatkan error "org.javalite.activejdbc.InitException: you are trying to work with models, but no models are found", sebelum compile jalankan perintah "mvn process-classes" atau "mvn activejdbc-instrumentation:instrument"
 ## Documentation
 cara penggunaan dan dokumentasi dapat dilihat di http://javalite.io/activejdbc
 
