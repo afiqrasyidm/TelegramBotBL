@@ -18,9 +18,12 @@ public class HelloBot extends BaseBot {
     return Ability.builder().name("hello").info("says hello world!").locality(ALL).privacy(PUBLIC)
         .action(ctx -> {
           // open connection to db
-          openConnection();
+          openDBConnection();
           // create new user
           new User().set("username","@vgeraldo").saveIt();
+          // close connection
+          closeDBConnection();
+
           silent.send("Hello world!", ctx.chatId());
         }).build();
   }

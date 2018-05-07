@@ -12,8 +12,12 @@ public class BaseBot extends AbilityBot {
         super(validToken(), validUsername());
     }
 
-    public void openConnection(){
+    public void openDBConnection(){
         Base.open("org.postgresql.Driver", validHost(), validUser(), validPassword());
+    }
+
+    public void closeDBConnection(){
+        Base.close();
     }
 
     private static String validToken() {
