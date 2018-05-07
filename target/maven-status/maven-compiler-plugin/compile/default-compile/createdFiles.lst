@@ -1,4 +1,5 @@
+com/mycompany/app/Tables$User.class
 com/mycompany/app/BaseBot.class
 com/mycompany/app/Main.class
-com/mycompany/app/models/User.class
 com/mycompany/app/HelloBot.class
+com/mycompany/app/Tables.class

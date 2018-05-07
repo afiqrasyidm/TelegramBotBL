@@ -91,15 +91,21 @@
       <artifactId>java-dotenv</artifactId>
       <version>3.1.0</version>
     </dependency>
+
+
     <dependency>
-      <groupId>org.javalite</groupId>
-      <artifactId>activejdbc</artifactId>
-      <version>1.4.13</version>
+    	<groupId>com.github.tchoulihan</groupId>
+    	<artifactId>activejdbc</artifactId>
+    	<version>1.4.20</version>
+    	<exclusions>
+    		<exclusion>
+    			<groupId>opensymphony</groupId>
+    			<artifactId>oscache</artifactId>
+    		</exclusion>
+    	</exclusions>
     </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>9.1-901-1.jdbc4</version>
-    </dependency>
+
+
+    
   </dependencies>
 </project>

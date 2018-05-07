@@ -30,8 +30,11 @@ import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Locality.USER;
 import static org.telegram.abilitybots.api.objects.Privacy.ADMIN;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
+import org.javalite.activejdbc.Base;
 
-import com.mycompany.app.models.*;
+import com.mycompany.app.Tables.*;
+
+
 import java.sql.*;
 
 public class HelloBot extends BaseBot {
@@ -40,7 +43,8 @@ public class HelloBot extends BaseBot {
 
   public HelloBot() throws Exception {
     super();
-    stmt = super.ConnecttoDB();
+  //  stmt = super.ConnecttoDB();
+      //super.openDBConnection();
   }
 
 
@@ -124,29 +128,18 @@ public class HelloBot extends BaseBot {
                     .locality(USER)
                     .privacy(ADMIN)
                     .action(ctx ->       {
-                        String rst = "";
+                    //    String rst = "";
                         if(ctx.arguments().length == 0 ){
 
                               silent.send("start", ctx.chatId());
                         }
                         else{
-                            try{
-                              String  sql = "SELECT * FROM hackaton.user";
-                              ResultSet rs = stmt.executeQuery(sql);
-
-                                while(rs.next()){
-                                         //Retrieve by column name
-                                         String username = rs.getString("username");
-
-                                         //Display values
-                                        rst = rst + " " + username;
-
-                                 }
-                            }
-                            catch(Exception e){
-
-                            }
-                                silent.send(rst, ctx.chatId());
+                                //open db connection (it is a must before a query)
+                                super.openDBConnection();
+                                User user = Tables.USER.findFirst("id = ?", 1);
+                                silent.send(" "+ user.get("username"), ctx.chatId());
+                                //close db
+                                super.closeDBConnection();
                         }
 
                      })

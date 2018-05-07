@@ -17,9 +17,11 @@ public class BaseBot extends AbilityBot {
 
     public BaseBot() {
         super(validToken(), validUsername());
+      //   Base.open("org.postgresql.Driver", "jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
     }
 
     public void openDBConnection(){
+
         Base.open("org.postgresql.Driver", validHost(), validUser(), validPassword());
     }
 
