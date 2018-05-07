@@ -25,21 +25,28 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import com.mycompany.app.CalendarQuickstart;
-
 import static org.telegram.abilitybots.api.objects.Flag.*;
 import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Locality.USER;
 import static org.telegram.abilitybots.api.objects.Privacy.ADMIN;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
-public class HelloBot extends AbilityBot {
-  public static String BOT_TOKEN = "599164260:AAGJcr3NdXBs8TsSng4_b_w_gHwkptD13II";
-  public static String BOT_USERNAME = "afiqbotbot";
+import com.mycompany.app.models.*;
+import java.sql.*;
 
-  public HelloBot() {
-    super(BOT_TOKEN, BOT_USERNAME);
+public class HelloBot extends BaseBot {
+  private Statement stmt ;
+
+
+  public HelloBot() throws Exception {
+    super();
+    stmt = super.ConnecttoDB();
   }
+
+
+
+
+
 
   public Ability playWithMe() {
       String playMessage = "Play with me!";
@@ -92,6 +99,8 @@ public class HelloBot extends AbilityBot {
 
 
       public Ability sayHelloWorld() {
+
+
           return Ability
                     .builder()
                     .name("hello")
@@ -103,8 +112,8 @@ public class HelloBot extends AbilityBot {
                     .post(ctx -> silent.send("Bye world!", ctx.chatId()))
                     .build();
       }
-
-      public Ability getToken() {
+      //untuk percobaan query db jadi tulis /start <argument apapun>
+      public Ability TestingDb()  {
 
 
           return Ability
@@ -115,50 +124,36 @@ public class HelloBot extends AbilityBot {
                     .locality(USER)
                     .privacy(ADMIN)
                     .action(ctx ->       {
-
+                        String rst = "";
                         if(ctx.arguments().length == 0 ){
 
                               silent.send("start", ctx.chatId());
                         }
                         else{
-                                silent.send(ctx.secondArg(), ctx.chatId());
+                            try{
+                              String  sql = "SELECT * FROM hackaton.user";
+                              ResultSet rs = stmt.executeQuery(sql);
+
+                                while(rs.next()){
+                                         //Retrieve by column name
+                                         String username = rs.getString("username");
+
+                                         //Display values
+                                        rst = rst + " " + username;
+
+                                 }
+                            }
+                            catch(Exception e){
+
+                            }
+                                silent.send(rst, ctx.chatId());
                         }
 
                      })
                     .build();
       }
 
-      public Ability getEvents() throws IOException, GeneralSecurityException {
 
-
-          return Ability
-                    .builder()
-                    .name("events")
-                    .info("tell events")
-                    .input(0)
-                    .locality(ALL)
-                    .privacy(PUBLIC)
-                    .action(ctx ->
-                      {
-                         try {
-                           CalendarQuickstart cal = new CalendarQuickstart();
-
-                            silent.send(cal.getEvents(), ctx.chatId());
-                          }
-                          catch (IOException e ) {
-                              e.printStackTrace(); // Or something more intelligent
-                          }
-                          catch (GeneralSecurityException e) {
-                              e.printStackTrace(); // Or something more intelligent
-                          }
-                      })
-                    .build();
-
-      }
-  @Override
-   public int creatorId() {
-     return 470958982;
-   }
 
 
 
