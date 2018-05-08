@@ -140,7 +140,7 @@ public class HelloBot extends BaseBot {
                         User user = Tables.USER.findFirst("username = ?", username);
 
                         History record = new History();
-                        record.set("id", user.get("id"))
+                        record.set("user_id", user.get("id"))
                                 .set("status", "remote")
                                 .set("tanggal", newDate)
                                 .set("reason", alasan);
@@ -176,7 +176,7 @@ public class HelloBot extends BaseBot {
                         User user = Tables.USER.findFirst("username = ?", username);
 
                         History record = new History();
-                        record.set("id", user.get("id"))
+                        record.set("user_id", user.get("id"))
                                 .set("status", "cuti")
                                 .set("tanggal", newDate);
                         record.saveIt();
@@ -211,7 +211,7 @@ public class HelloBot extends BaseBot {
                         User user = Tables.USER.findFirst("username = ?", username);
 
                         History record = new History();
-                        record.set("id", user.get("id"))
+                        record.set("user_id", user.get("id"))
                                 .set("status", "sakit")
                                 .set("tanggal", newDate);
                         record.saveIt();
