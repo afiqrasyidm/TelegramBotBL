@@ -39,6 +39,9 @@ import java.sql.*;
 
 public class HelloBot extends BaseBot {
     private Statement stmt;
+    private enum Status {
+        REMOTE, CUTI, SAKIT;
+    }
 
     public HelloBot() throws Exception {
         super();
@@ -131,5 +134,45 @@ public class HelloBot extends BaseBot {
                     }
                 })
                 .build();
+    }
+
+    public Ability setRemote() {
+      // arg 1 = tanggal
+      // arg 2 = alasan
+        return Ability
+                .builder()
+                .name("remote")
+                .info("Set status menjadi remote")
+                .input(2)
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    String tanggal = ctx.firstArg();
+                    String alasan = ctx.secondArg();
+                    if (statusArgsIsValid(tanggal, alasan, Status.REMOTE)) {
+
+                    }
+                })
+                .build();
+    }
+
+    public Ability setCuti() {
+      // arg 1 = tanggal
+
+    }
+
+    public Ability setSakit() {
+      // arg 1 = tanggal
+
+    }
+
+    private boolean statusArgsIsValid(String tanggal, String alasan, Status status) {
+        if (status == Status.REMOTE) {
+
+        } else if (status == Status.CUTI) {
+
+        } else if (status == Status.SAKIT) {
+
+        }
     }
 }
