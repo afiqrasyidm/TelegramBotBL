@@ -182,13 +182,15 @@ public class HelloBot extends BaseBot {
                 .builder()
                 .name("cuti")
                 .info("Set status menjadi cuti")
-                .input(1)
+                .input(2)
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    String tanggal = ctx.firstArg();
-                    if (dateIsValid(tanggal)) {
-                        java.sql.Date newDate = changeDateFormat(tanggal);
+                    String tanggalMulai = ctx.firstArg();
+                    String tanggalSelesai = ctx.secondArg();
+                    if (dateIsValid(tanggalMulai) && dateIsValid(tanggalSelesai)) {
+                        java.sql.Date newDateMulai = changeDateFormat(tanggalMulai);
+                        java.sql.Date newDateSelesai = changeDateFormat(tanggalSelesai);
 
                         openDBConnection();
 
@@ -199,17 +201,17 @@ public class HelloBot extends BaseBot {
                             History history = Tables.HISTORY.findFirst(
                                     "user_id = ? AND tanggal = ? AND status = ?",
                                     user.get("id"),
-                                    newDate,
+                                    newDateMulai,
                                     CUTI);
 
                             if (history == null) {
                                 History record = new History();
                                 record.set("user_id", user.get("id"))
                                         .set("status", CUTI)
-                                        .set("tanggal", newDate);
+                                        .set("tanggal", newDateMulai);
                                 record.saveIt();
                             } else {
-                                silent.send("Kamu sudah mengajukan " + CUTI + " di tanggal " + tanggal, ctx.chatId());
+                                silent.send("Kamu sudah mengajukan " + CUTI + " di tanggal " + newDateMulai, ctx.chatId());
                             }
                         }
 
@@ -298,9 +300,5 @@ public class HelloBot extends BaseBot {
         } catch (ParseException e) {
             return null;
         }
-    }
-
-    private void setStatus(String tanggal, String alasan, SilentSender silent) {
-
     }
 }
