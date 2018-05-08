@@ -130,14 +130,14 @@ public class HelloBot extends BaseBot {
                 .builder()
                 .name("remote")
                 .info("Set status menjadi remote")
-                .input(2)
+                .input(0)
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     String tanggal = ctx.firstArg();
-                    String alasan = "";
-                    for (int i = 1; i < ctx.arguments().length; i++) {
-                        alasan += ctx.arguments()[i];
+                    String alasan = ctx.secondArg();
+                    for (int i = 2; i < ctx.arguments().length; i++) {
+                        alasan += " " + ctx.arguments()[i];
                     }
                     if (dateIsValid(tanggal)) {
                         java.sql.Date newDate = changeDateFormat(tanggal);
@@ -154,7 +154,7 @@ public class HelloBot extends BaseBot {
                                     newDate,
                                     REMOTE);
 
-                            if (history != null) {
+                            if (history == null) {
                                 History record = new History();
                                 record.set("user_id", user.get("id"))
                                         .set("status", REMOTE)
@@ -202,7 +202,7 @@ public class HelloBot extends BaseBot {
                                     newDate,
                                     CUTI);
 
-                            if (history != null) {
+                            if (history == null) {
                                 History record = new History();
                                 record.set("user_id", user.get("id"))
                                         .set("status", CUTI)
@@ -249,7 +249,7 @@ public class HelloBot extends BaseBot {
                                     newDate,
                                     SAKIT);
 
-                            if (history != null) {
+                            if (history == null) {
                                 History record = new History();
                                 record.set("user_id", user.get("id"))
                                         .set("status", SAKIT)
