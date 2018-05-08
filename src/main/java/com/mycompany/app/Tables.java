@@ -14,4 +14,8 @@ public class Tables{
 public static class User extends Model {}
 public static final User USER = new User();
 
+ @Table("hackaton.History")
+public static class History extends Model {}
+public static final History HISTORY = new History();
+
 }
