@@ -258,7 +258,6 @@ public class HelloBot extends BaseBot {
                     .action(ctx ->       {
                     //    String rst = "";
                         if(ctx.arguments().length == 1 ){
-
                               super.openDBConnection();
 
 
@@ -295,5 +294,49 @@ public class HelloBot extends BaseBot {
                     .build();
       }
 
+      public Ability historyByUsername()  {
+        return Ability
+          .builder()
+          .name("historyByUsername")
+          .info("Lihat semua riwayat status dari seorang user")
+          .input(1)
+          .locality(ALL)
+          .privacy(PUBLIC)
+          .action(ctx ->       {
+            String arg = ctx.firstArg();
 
-}
+              super.openDBConnection();
+              User user = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+
+              if(user != null){
+
+                  int userID = Integer.parseInt(user.get("id").toString());
+                  List<History> history = Tables.HISTORY.where("id = ?", userID);
+
+                  if(history.size() > 0){
+                      String finalString = "Hai kaka, berikut riwayat status si " + arg + " : \n";
+                    for(int i = 0; i < history.size(); i++) {
+                      String tanggal = history.get(i).get("tanggal").toString();
+                      String status = history.get(i).get("status").toString();
+                      String alasan = history.get(i).get("reason").toString();
+                      finalString += "tanggal : " + tanggal + ", "+ status + " dengan alasan " + alasan +"\n";
+
+                    }
+                    silent.send(finalString, ctx.chatId());
+                  }
+                  else{
+                    silent.send("History apapun belum ada", ctx.chatId());
+
+                  }
+
+                //close db
+                super.closeDBConnection();
+            } else{
+              silent.send("Username " + arg + " tidak terdaftar", ctx.chatId());
+            }
+          }).build();
+      }
+
+
+
+    }
