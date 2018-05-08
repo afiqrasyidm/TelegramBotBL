@@ -34,7 +34,10 @@ import org.javalite.activejdbc.Base;
 
 import com.mycompany.app.Tables.*;
 
-
+import java.text.ParseException;
+import java.util.*;
+import java.time.*;
+import java.time.format.*;
 import java.sql.*;
 
 public class HelloBot extends BaseBot {
@@ -370,7 +373,7 @@ public class HelloBot extends BaseBot {
                       if(alasanObj != null){
                         alasan = history.get(i).get("reason").toString();
                       }
-                      finalString += "tanggal : " + tanggal + ", "+ status + " dengan alasan " + alasan +"\n";
+                      finalString += "tanggal : " + tanggal + ", status : "+ status + ", alasan : " + alasan +"\n";
                     }
                     silent.send(finalString, ctx.chatId());
                   }
@@ -387,6 +390,46 @@ public class HelloBot extends BaseBot {
           }).build();
       }
 
+      public Ability historyByTanggal()  {
+        return Ability
+          .builder()
+          .name("historyByTanggal")
+          .info("Lihat semua riwayat status pada tanggal tertentu")
+          .input(1)
+          .locality(ALL)
+          .privacy(PUBLIC)
+          .action(ctx ->       {
+            try {
+              String arg = ctx.secondArg();
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+              LocalDate date = LocalDate.parse(arg, formatter);
+              super.openDBConnection();
+              List<History> history = Tables.HISTORY.where("tanggal = ?", date);
+              String finalString = "";
+              if (history.size() > 0) {
+                finalString = "Hai kaka, berikut riwayat status pada tanggal " + arg + " : \n";
 
+                for(int i = 0; i < history.size(); i++) {
+                  int id = Integer.parseInt(history.get(i).get("user_id").toString());
+                  String username = Tables.USER.findFirst("id = ?", id).get("username").toString();
+                  String status = history.get(i).get("status").toString();
+                  String alasan = "";
+                  try {
+                    alasan = history.get(i).get("reason").toString();
+                  } catch (NullPointerException e) {
+
+                  }
+                  finalString += "username : @" + username + ", status : " + status + ", alasan : " + alasan +"\n";
+                }
+              } else {
+                finalString = "Hai kaka, pada tanggal " + arg + " semuanya masuk nih";
+              }
+              silent.send(finalString, ctx.chatId());
+            } catch (DateTimeParseException e) {
+              silent.send("Hai kaka, format tanggal salah", ctx.chatId());
+            }
+            super.closeDBConnection();
+          }).build();
+      }
 
     }
