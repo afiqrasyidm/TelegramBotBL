@@ -64,6 +64,11 @@
   </build>
   <dependencies>
     <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.2</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
@@ -85,14 +90,15 @@
       <version>3.1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.javalite</groupId>
+      <groupId>com.github.tchoulihan</groupId>
       <artifactId>activejdbc</artifactId>
-      <version>1.4.13</version>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>9.1-901-1.jdbc4</version>
+      <version>1.4.20</version>
+      <exclusions>
+        <exclusion>
+          <groupId>opensymphony</groupId>
+          <artifactId>oscache</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
