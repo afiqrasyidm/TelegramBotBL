@@ -132,12 +132,16 @@ public class HelloBot extends BaseBot {
                     String tanggal = ctx.firstArg();
                     String alasan = ctx.secondArg();
                     if (dateIsValid(tanggal)) {
-                        String newDate = changeDateFormat(tanggal);
+                        java.sql.Date newDate = changeDateFormat(tanggal);
 
                         openDBConnection();
 
+                        String username = ctx.user().username();
+                        User user = Tables.USER.findFirst("username = ?", username);
+
                         History record = new History();
-                        record.set("status", "remote")
+                        record.set("id", user.get("id"))
+                                .set("status", "remote")
                                 .set("tanggal", newDate)
                                 .set("reason", alasan);
                         record.saveIt();
@@ -164,12 +168,16 @@ public class HelloBot extends BaseBot {
                 .action(ctx -> {
                     String tanggal = ctx.firstArg();
                     if (dateIsValid(tanggal)) {
-                        String newDate = changeDateFormat(tanggal);
+                        java.sql.Date newDate = changeDateFormat(tanggal);
 
                         openDBConnection();
 
+                        String username = ctx.user().username();
+                        User user = Tables.USER.findFirst("username = ?", username);
+
                         History record = new History();
-                        record.set("status", "cuti")
+                        record.set("id", user.get("id"))
+                                .set("status", "cuti")
                                 .set("tanggal", newDate);
                         record.saveIt();
 
@@ -195,12 +203,16 @@ public class HelloBot extends BaseBot {
                 .action(ctx -> {
                     String tanggal = ctx.firstArg();
                     if (dateIsValid(tanggal)) {
-                        String newDate = changeDateFormat(tanggal);
+                        java.sql.Date newDate = changeDateFormat(tanggal);
 
                         openDBConnection();
 
+                        String username = ctx.user().username();
+                        User user = Tables.USER.findFirst("username = ?", username);
+
                         History record = new History();
-                        record.set("status", "sakit")
+                        record.set("id", user.get("id"))
+                                .set("status", "sakit")
                                 .set("tanggal", newDate);
                         record.saveIt();
 
@@ -227,19 +239,24 @@ public class HelloBot extends BaseBot {
         }
     }
 
-    private String changeDateFormat(String oldTanggal) {
+    private java.sql.Date changeDateFormat(String oldTanggal) {
         SimpleDateFormat oldDateFormat = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
             Date oldDate = oldDateFormat.parse(oldTanggal);
-            return newDateFormat.format(oldDate);
+
+            String date = newDateFormat.format(oldDate);
+            Date newDate = newDateFormat.parse(date);
+
+            java.sql.Date sqlDate = new java.sql.Date(newDate.getTime());
+            return sqlDate;
         } catch (ParseException e) {
-            return "";
+            return null;
         }
     }
 
     private void setStatus(String tanggal, String alasan, SilentSender silent) {
-        
+
     }
 }
