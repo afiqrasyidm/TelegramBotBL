@@ -156,20 +156,24 @@ public class HelloBot extends BaseBot {
           .privacy(PUBLIC)
           .action(ctx ->       {
             String arg = ctx.firstArg();
-            super.openDBConnection();
-            User user = Tables.USER.findFirst("username = ?", arg);
-            int userID = Integer.parseInt(user.get("id").toString());
-            List<History> history = Tables.HISTORY.where("id = ?", userID);
-            String finalString = "Hai kaka, berikut riwayat status si " + arg + " : \n";
-            for(int i = 0; i < history.size(); i++) {
-              String tanggal = history.get(i).get("tanggal").toString();
-              String status = history.get(i).get("status").toString();
-              String alasan = history.get(i).get("reason").toString();
-              finalString += "tanggal : " + tanggal + ", "+ status + " dengan alasan " + alasan +"\n";
+            try{
+              super.openDBConnection();
+              User user = Tables.USER.findFirst("username = ?", arg);
+              int userID = Integer.parseInt(user.get("id").toString());
+              List<History> history = Tables.HISTORY.where("id = ?", userID);
+              String finalString = "Hai kaka, berikut riwayat status si " + arg + " : \n";
+              for(int i = 0; i < history.size(); i++) {
+                String tanggal = history.get(i).get("tanggal").toString();
+                String status = history.get(i).get("status").toString();
+                String alasan = history.get(i).get("reason").toString();
+                finalString += "tanggal : " + tanggal + ", "+ status + " dengan alasan " + alasan +"\n";
+              }
+              silent.send(finalString, ctx.chatId());
+              //close db
+              super.closeDBConnection();
+            } catch(Exception e){
+              silent.send("Username " + arg + " tidak terdaftar", ctx.chatId());
             }
-            silent.send(finalString, ctx.chatId());
-            //close db
-            super.closeDBConnection();
           }).build();
       }
 }
