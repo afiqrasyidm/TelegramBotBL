@@ -79,7 +79,7 @@ public class BaseBot extends AbilityBot {
         return dbUser;
     }
 
-    private static String validPassword(){
+    private static String validPassword() {
         String dbPass = System.getenv().get("DB_PASSWORD");
         if (dbPass == null) {
             return dotenv.get("DB_PASSWORD");
@@ -95,65 +95,4 @@ public class BaseBot extends AbilityBot {
         }
         return Integer.parseInt(creatorId);
     }
-
-    public Statement ConnecttoDB() throws Exception {
-
-        Statement stmt = null;
-
-        try {
-
-            Class.forName("org.postgresql.Driver");
-
-        } catch (ClassNotFoundException e) {
-
-            System.out.println("Where is your PostgreSQL JDBC Driver? " + "Include in your library path!");
-            e.printStackTrace();
-
-        }
-
-        System.out.println("PostgreSQL JDBC Driver Registered!");
-
-        Connection connection = null;
-
-        try {
-
-            connection = DriverManager.getConnection(validHost(), validUser(), validPassword());
-
-        } catch (SQLException e) {
-
-            System.out.println("Connection Failed! Check output console");
-            e.printStackTrace();
-
-        }
-
-        if (connection != null) {
-            try {
-                stmt = connection.createStatement();
-            }
-
-            catch (Exception e) {
-
-                System.out.println("Connection Failed! Check output console");
-                e.printStackTrace();
-
-            }
-            /*
-             * String sql; sql = "SELECT * FROM hackaton.user"; ResultSet rs =
-             * stmt.executeQuery(sql);
-             *
-             * while(rs.next()){ //Retrieve by column name String username =
-             * rs.getString("username");
-             *
-             * //Display values
-             *
-             * System.out.print("Username: " + username); }
-             */
-            System.out.println("You made it, take control your database now!");
-        } else {
-            System.out.println("Failed to make connection!");
-        }
-
-        return stmt;
-    }
-
 }

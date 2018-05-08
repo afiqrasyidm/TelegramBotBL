@@ -1,5 +1,7 @@
 package com.mycompany.app.jobs;
 
+import java.util.Arrays;
+
 import com.mycompany.app.BaseBot;
 import com.mycompany.app.Tables.*;
 
@@ -33,10 +35,13 @@ public class BroadcastJob implements Job {
 		OkHttpClient client = new OkHttpClient();
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
+		System.out.println(Arrays.toString(chatIds));
 		for (String id : chatIds) {
 			RequestBody body = RequestBody.create(JSON, getChatMemberPayload(id, userId));
 			Request request = new Request.Builder().url(getMemberUrl).post(body).build();
 			try (Response response = client.newCall(request).execute()) {
+				System.out.println(response.body());
+				System.out.println(response.isSuccessful());
 				if (!response.isSuccessful()) {
 					continue;
 				}
@@ -64,6 +69,8 @@ public class BroadcastJob implements Job {
 			;
 		} else if (action.equals("cuti")) {
 			message += " hingga tanggal " + dataMap.getString(END_DATE) + ".";
+		} else {
+			message = "Teman - teman, hari ini saya izin tidak masuk karena sedang sakit.";
 		}
 		return message;
 	}
