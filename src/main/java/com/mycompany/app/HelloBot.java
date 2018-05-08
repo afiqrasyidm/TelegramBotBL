@@ -157,7 +157,7 @@ public class HelloBot extends BaseBot {
                     .info("says hello world!")
                     .input(0)
                     .privacy(PUBLIC)
-                    .locality(ALL)
+                    .locality(USER)
                     .action(ctx ->       {
                     //    String rst = "";
                         if(ctx.arguments().length == 0 ){
@@ -182,6 +182,55 @@ public class HelloBot extends BaseBot {
                               }
                               else{
                                 silent.send("Hallo untuk bantuan silahkan ketik /help", ctx.chatId());
+
+
+                              }
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+
+                     })
+                    .build();
+      }
+
+
+      //start user from
+      public Ability StartingBeforeConfigurationGroup()  {
+
+
+          return Ability
+                    .builder()
+                    .name("startgroup")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
+                    .action(ctx ->       {
+                    //    String rst = "";
+                        if(ctx.arguments().length == 0 ){
+
+                              super.openDBConnection();
+
+
+                              Group group = Tables.GROUP.findFirst("chat_id = ?",ctx.chatId());
+                                if(group == null){
+                                  group = new Group();
+
+                                  //user.set("username", ctx.user().username());
+                              //    group.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                //  group.saveIt();
+
+
+                                  silent.send(""+ctx.chatId(), ctx.chatId());
+
+                                //  silent.send("Untuk menambahkan supervisor kamu, silahkan tulis /addsupervisor1 [@username] atau /addsupervisor2 [@username]", ctx.chatId());
+                                //close db
+                              }
+                              else{
+                                silent.send("Notifikasi cuti/remote/sakit telah di set di group ini sebelumnya", ctx.chatId());
 
 
                               }

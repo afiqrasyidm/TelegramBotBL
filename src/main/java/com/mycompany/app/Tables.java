@@ -18,4 +18,10 @@ public static final User USER = new User();
 public static class History extends Model {}
 public static final History HISTORY = new History();
 
+
+
+@Table("hackaton.Group")
+public static class Group extends Model {}
+public static final Group GROUP = new Group();
+
 }
