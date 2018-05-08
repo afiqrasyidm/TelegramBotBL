@@ -1,6 +1,5 @@
 package com.mycompany.app;
 
-import javafx.scene.control.Tab;
 import org.telegram.abilitybots.api.objects.Ability;
 
 import org.telegram.abilitybots.api.sender.SilentSender;
@@ -742,61 +741,62 @@ public class HelloBot extends BaseBot {
             super.closeDBConnection();
           }).build();
       }
-    }
+    
 
 
     public int[] getSupervisorChatId(String username)  {
-          int[] supervisorChatIds = {-1,-1};
-          User user = Tables.USER.findFirst("username = ?", username);
+      int[] supervisorChatIds = {-1,-1};
+      User user = Tables.USER.findFirst("username = ?", username);
 
-          if(user != null) {
-            String strId1 = "";
-            String strId2 = "";
-            try {
-              strId1 = user.get("supervisor1_id").toString();
-            } catch (NullPointerException e) {
-              //TODO: handle exception
-            }
-
-            try {
-              strId2 = user.get("supervisor2_id").toString();
-            } catch (NullPointerException e) {
-              //TODO: handle exception
-            }
-            int supervisor1Id = -1;
-            int supervisor2Id = -1;
-
-            if(strId1 != "") {
-              supervisor1Id = Integer.parseInt(strId1);
-            }
-            if(strId2 != "") {
-              supervisor2Id = Integer.parseInt(strId2);
-            }
-            
-            int[] supervisorIds = {supervisor1Id, supervisor2Id};
-            int chatIdsIdx = 0;
-            for(int supervisorId : supervisorIds) {
-              if(supervisorId != -1) {
-                User supervisor = Tables.USER.findFirst("id = ?", supervisorId);
-
-                if(supervisor != null) {
-                  String strChatId = "";
-                  try {
-                    strChatId = supervisor.get("chat_id").toString();;  
-                  } catch (Exception e) {
-                    //TODO: handle exception
-                  }
-                  
-                  int chatId = -1;
-                  if(strChatId != "") {
-                    chatId = Integer.parseInt(strChatId);
-                  }
-                  supervisorChatIds[chatIdsIdx] = chatId;
-                  chatIdsIdx ++;
-                } 
-              }
-            }  
-          } 
-          return supervisorChatIds;
+      if(user != null) {
+        String strId1 = "";
+        String strId2 = "";
+        try {
+          strId1 = user.get("supervisor1_id").toString();
+        } catch (NullPointerException e) {
+          //TODO: handle exception
         }
-      }
+
+        try {
+          strId2 = user.get("supervisor2_id").toString();
+        } catch (NullPointerException e) {
+          //TODO: handle exception
+        }
+        int supervisor1Id = -1;
+        int supervisor2Id = -1;
+
+        if(strId1 != "") {
+          supervisor1Id = Integer.parseInt(strId1);
+        }
+        if(strId2 != "") {
+          supervisor2Id = Integer.parseInt(strId2);
+        }
+        
+        int[] supervisorIds = {supervisor1Id, supervisor2Id};
+        int chatIdsIdx = 0;
+        for(int supervisorId : supervisorIds) {
+          if(supervisorId != -1) {
+            User supervisor = Tables.USER.findFirst("id = ?", supervisorId);
+
+            if(supervisor != null) {
+              String strChatId = "";
+              try {
+                strChatId = supervisor.get("chat_id").toString();;  
+              } catch (Exception e) {
+                //TODO: handle exception
+              }
+              
+              int chatId = -1;
+              if(strChatId != "") {
+                chatId = Integer.parseInt(strChatId);
+              }
+              supervisorChatIds[chatIdsIdx] = chatId;
+              chatIdsIdx ++;
+            } 
+          }
+        }  
+      } 
+      return supervisorChatIds;
+    }
+  }
+    
