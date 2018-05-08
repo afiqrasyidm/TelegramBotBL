@@ -38,117 +38,98 @@ import com.mycompany.app.Tables.*;
 import java.sql.*;
 
 public class HelloBot extends BaseBot {
-  private Statement stmt ;
+    private Statement stmt;
 
-
-  public HelloBot() throws Exception {
-    super();
-  //  stmt = super.ConnecttoDB();
-      //super.openDBConnection();
-  }
-
-
-
-
-
-
-  public Ability playWithMe() {
-      String playMessage = "Play with me!";
-
-      return Ability
-          .builder()
-          .name("play")
-          .info("Do you want to play with me?")
-          .privacy(PUBLIC)
-          .locality(ALL)
-          .input(0)
-          .action(ctx -> silent.forceReply(playMessage, ctx.chatId()))
-          // The signature of a reply is -> (Consumer<Update> action, Predicate<Update>... conditions)
-          // So, we  first declare the action that takes an update (NOT A MESSAGECONTEXT) like the action above
-          // The reason of that is that a reply can be so versatile depending on the message, context becomes an inefficient wrapping
-          .reply(upd -> {
-                // Prints to console
-                System.out.println("I'm in a reply!");
-                // Sends message
-                silent.send("It's been nice playing with you!", upd.getMessage().getChatId());
-              },
-              // Now we start declaring conditions, MESSAGE is a member of the enum Flag class
-              // That class contains out-of-the-box predicates for your replies!
-              // MESSAGE means that the update must have a message
-              // This is imported statically, Flag.MESSAGE
-              MESSAGE,
-              // REPLY means that the update must be a reply, Flag.REPLY
-              REPLY,
-              // A new predicate user-defined
-              // The reply must be to the bot
-              isReplyToBot(),
-              // If we process similar logic in other abilities, then we have to make this reply specific to this message
-              // The reply is to the playMessage
-              isReplyToMessage(playMessage)
-          )
-          // You can add more replies by calling .reply(...)
-          .build();
+    public HelloBot() throws Exception {
+        super();
+        //stmt = super.ConnecttoDB();
+        //super.openDBConnection();
     }
 
-      private Predicate<Update> isReplyToMessage(String message) {
+    public Ability playWithMe() {
+        String playMessage = "Play with me!";
+
+        return Ability
+                .builder()
+                .name("play")
+                .info("Do you want to play with me?")
+                .privacy(PUBLIC)
+                .locality(ALL)
+                .input(0)
+                .action(ctx -> silent.forceReply(playMessage, ctx.chatId()))
+                // The signature of a reply is -> (Consumer<Update> action, Predicate<Update>... conditions)
+                // So, we  first declare the action that takes an update (NOT A MESSAGECONTEXT) like the action above
+                // The reason of that is that a reply can be so versatile depending on the message, context becomes an inefficient wrapping
+                .reply(upd -> {
+                            // Prints to console
+                            System.out.println("I'm in a reply!");
+                            // Sends message
+                            silent.send("It's been nice playing with you!", upd.getMessage().getChatId());
+                        },
+                    // Now we start declaring conditions, MESSAGE is a member of the enum Flag class
+                    // That class contains out-of-the-box predicates for your replies!
+                    // MESSAGE means that the update must have a message
+                    // This is imported statically, Flag.MESSAGE
+                    MESSAGE,
+                    // REPLY means that the update must be a reply, Flag.REPLY
+                    REPLY,
+                    // A new predicate user-defined
+                    // The reply must be to the bot
+                    isReplyToBot(),
+                    // If we process similar logic in other abilities, then we have to make this reply specific to this message
+                    // The reply is to the playMessage
+                    isReplyToMessage(playMessage)
+                )
+                // You can add more replies by calling .reply(...)
+                .build();
+    }
+
+    private Predicate<Update> isReplyToMessage(String message) {
         return upd -> {
-          Message reply = upd.getMessage().getReplyToMessage();
-          return reply.hasText() && reply.getText().equalsIgnoreCase(message);
+            Message reply = upd.getMessage().getReplyToMessage();
+            return reply.hasText() && reply.getText().equalsIgnoreCase(message);
         };
-      }
+    }
 
-      private Predicate<Update> isReplyToBot() {
+    private Predicate<Update> isReplyToBot() {
         return upd -> upd.getMessage().getReplyToMessage().getFrom().getUserName().equalsIgnoreCase(getBotUsername());
-      }
+    }
 
+    public Ability sayHelloWorld() {
+        return Ability
+                .builder()
+                .name("hello")
+                .info("says hello world!")
+                .input(0)
+                .locality(USER)
+                .privacy(ADMIN)
+                .action(ctx -> silent.send("Hello world!", ctx.chatId()))
+                .post(ctx -> silent.send("Bye world!", ctx.chatId()))
+                .build();
+    }
 
-      public Ability sayHelloWorld() {
-
-
-          return Ability
-                    .builder()
-                    .name("hello")
-                    .info("says hello world!")
-                    .input(0)
-                    .locality(USER)
-                    .privacy(ADMIN)
-                    .action(ctx -> silent.send("Hello world!", ctx.chatId()))
-                    .post(ctx -> silent.send("Bye world!", ctx.chatId()))
-                    .build();
-      }
-      //untuk percobaan query db jadi tulis /start <argument apapun>
-      public Ability TestingDb()  {
-
-
-          return Ability
-                    .builder()
-                    .name("start")
-                    .info("says hello world!")
-                    .input(0)
-                    .locality(USER)
-                    .privacy(ADMIN)
-                    .action(ctx ->       {
+    //untuk percobaan query db jadi tulis /start <argument apapun>
+    public Ability testingDB() {
+        return Ability
+                .builder()
+                .name("start")
+                .info("says hello world!")
+                .input(0)
+                .locality(USER)
+                .privacy(ADMIN)
+                .action(ctx -> {
                     //    String rst = "";
-                        if(ctx.arguments().length == 0 ){
-
-                              silent.send("start", ctx.chatId());
-                        }
-                        else{
-                                //open db connection (it is a must before a query)
-                                super.openDBConnection();
-                                User user = Tables.USER.findFirst("id = ?", 1);
-                                silent.send(" "+ user.get("username"), ctx.chatId());
-                                //close db
-                                super.closeDBConnection();
-                        }
-
-                     })
-                    .build();
-      }
-
-
-
-
-
-
+                    if (ctx.arguments().length == 0) {
+                        silent.send("start", ctx.chatId());
+                    } else {
+                        //open db connection (it is a must before a query)
+                        super.openDBConnection();
+                        User user = Tables.USER.findFirst("id = ?", 1);
+                        silent.send(" " + user.get("username"), ctx.chatId());
+                        //close db
+                        super.closeDBConnection();
+                    }
+                })
+                .build();
+    }
 }
