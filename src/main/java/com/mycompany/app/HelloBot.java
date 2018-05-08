@@ -135,7 +135,10 @@ public class HelloBot extends BaseBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     String tanggal = ctx.firstArg();
-                    String alasan = ctx.secondArg();
+                    String alasan = "";
+                    for (int i = 1; i < ctx.arguments().length; i++) {
+                        alasan += ctx.arguments()[i];
+                    }
                     if (dateIsValid(tanggal)) {
                         java.sql.Date newDate = changeDateFormat(tanggal);
 
