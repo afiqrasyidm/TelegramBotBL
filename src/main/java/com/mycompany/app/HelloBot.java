@@ -280,13 +280,19 @@ public class HelloBot extends BaseBot {
                         }
 
                         int[] chatIds = getSupervisorChatId(username);
+                        int sentStatus = -1;
                         for(int id : chatIds) {
                           if(id != -1) {
+                            sentStatus++;
                             silent.send("Halo, kaka!" + "\n"
                                         + "@" + username + " " + REMOTE + " pada tanggal "
                                         + tanggal + " karena "
                                         + alasan, id);
                           }
+                        }
+                        if(sentStatus == -1) {
+                          silent.send("Halo, kaka!" + "\n"
+                                        + "Kamu belum ngedaftarin supervisor nih", ctx.chatId());
                         }
 
 
@@ -338,6 +344,21 @@ public class HelloBot extends BaseBot {
                             } else {
                                 silent.send("Kamu sudah mengajukan " + CUTI + " di tanggal " + newDateMulai, ctx.chatId());
                             }
+                        }
+
+                        int[] chatIds = getSupervisorChatId(username);
+                        int sentStatus = -1;
+                        for(int id : chatIds) {
+                          if(id != -1) {
+                            sentStatus++;
+                            silent.send("Halo, kaka!" + "\n"
+                                        + "@" + username + " " + CUTI + " dari tanggal "
+                                        + tanggalMulai + " hingga " + tanggalSelesai, id);
+                          }
+                        }
+                        if(sentStatus == -1) {
+                          silent.send("Halo, kaka!" + "\n"
+                                        + "Kamu belum ngedaftarin supervisor nih", ctx.chatId());
                         }
 
                         closeDBConnection();
@@ -436,6 +457,21 @@ public class HelloBot extends BaseBot {
                             } else {
                                 silent.send("Kamu sudah mengajukan " + SAKIT + " di tanggal " + tanggal, ctx.chatId());
                             }
+                        }
+
+                        int[] chatIds = getSupervisorChatId(username);
+                        int sentStatus = -1;
+                        for(int id : chatIds) {
+                          if(id != -1) {
+                            sentStatus++;
+                            silent.send("Halo, kaka!" + "\n"
+                                        + "@" + username + " " + SAKIT + " pada tanggal "
+                                        + tanggal + ", jadi tidak bisa masuk kerja ya", id);
+                          }
+                        }
+                        if(sentStatus == -1) {
+                          silent.send("Halo, kaka!" + "\n"
+                                        + "Kamu belum ngedaftarin supervisor nih", ctx.chatId());
                         }
 
                         closeDBConnection();
