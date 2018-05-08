@@ -1,36 +1,21 @@
 package com.mycompany.app;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.glassfish.hk2.api.Visibility;
-import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 
+import org.telegram.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 
-import java.util.Map;
+import java.text.ParseException;
 import java.util.function.Predicate;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.List;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import static org.telegram.abilitybots.api.objects.Flag.*;
 import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Locality.USER;
 import static org.telegram.abilitybots.api.objects.Privacy.ADMIN;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
-import org.javalite.activejdbc.Base;
 
 import com.mycompany.app.Tables.*;
 
@@ -39,9 +24,6 @@ import java.sql.*;
 
 public class HelloBot extends BaseBot {
     private Statement stmt;
-    private enum Status {
-        REMOTE, CUTI, SAKIT;
-    }
 
     public HelloBot() throws Exception {
         super();
@@ -149,30 +131,115 @@ public class HelloBot extends BaseBot {
                 .action(ctx -> {
                     String tanggal = ctx.firstArg();
                     String alasan = ctx.secondArg();
-                    if (statusArgsIsValid(tanggal, alasan, Status.REMOTE)) {
+                    if (dateIsValid(tanggal)) {
+                        String newDate = changeDateFormat(tanggal);
 
+                        openDBConnection();
+
+                        History record = new History();
+                        record.set("status", "remote")
+                                .set("tanggal", newDate)
+                                .set("reason", alasan);
+                        record.saveIt();
+
+                        closeDBConnection();
+                    } else {
+                        // salah tanggal
+                        silent.send("Format tanggal salah", ctx.chatId());
                     }
                 })
                 .build();
     }
 
+    //blm
     public Ability setCuti() {
       // arg 1 = tanggal
+        return Ability
+                .builder()
+                .name("cuti")
+                .info("Set status menjadi cuti")
+                .input(1)
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    String tanggal = ctx.firstArg();
+                    if (dateIsValid(tanggal)) {
+                        String newDate = changeDateFormat(tanggal);
 
+                        openDBConnection();
+
+                        History record = new History();
+                        record.set("status", "cuti")
+                                .set("tanggal", newDate);
+                        record.saveIt();
+
+                        closeDBConnection();
+                    } else {
+                        // salah tanggal
+                        silent.send("Format tanggal salah", ctx.chatId());
+                    }
+                })
+                .build();
     }
 
+    //blm
     public Ability setSakit() {
       // arg 1 = tanggal
+        return Ability
+                .builder()
+                .name("sakit")
+                .info("Set status menjadi sakit")
+                .input(1)
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    String tanggal = ctx.firstArg();
+                    if (dateIsValid(tanggal)) {
+                        String newDate = changeDateFormat(tanggal);
 
+                        openDBConnection();
+
+                        History record = new History();
+                        record.set("status", "sakit")
+                                .set("tanggal", newDate);
+                        record.saveIt();
+
+                        closeDBConnection();
+                    } else {
+                        // salah tanggal
+                        silent.send("Format tanggal salah", ctx.chatId());
+                    }
+                })
+                .build();
     }
 
-    private boolean statusArgsIsValid(String tanggal, String alasan, Status status) {
-        if (status == Status.REMOTE) {
+    private boolean dateIsValid(String tanggal) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-        } else if (status == Status.CUTI) {
+        try {
+            Date inputDate = dateFormat.parse(tanggal);
+            Date currentDate = new Date();
 
-        } else if (status == Status.SAKIT) {
-
+            return inputDate.compareTo(currentDate) >= 0;
+        } catch (ParseException e) {
+            // salah format
+            return false;
         }
+    }
+
+    private String changeDateFormat(String oldTanggal) {
+        SimpleDateFormat oldDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        try {
+            Date oldDate = oldDateFormat.parse(oldTanggal);
+            return newDateFormat.format(oldDate);
+        } catch (ParseException e) {
+            return "";
+        }
+    }
+
+    private void setStatus(String tanggal, String alasan, SilentSender silent) {
+        
     }
 }
