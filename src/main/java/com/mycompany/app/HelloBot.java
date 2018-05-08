@@ -20,7 +20,10 @@ import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
 import com.mycompany.app.Tables.*;
 
-
+import java.text.ParseException;
+import java.util.*;
+import java.time.*;
+import java.time.format.*;
 import java.sql.*;
 
 public class HelloBot extends BaseBot {
@@ -83,47 +86,150 @@ public class HelloBot extends BaseBot {
 
     private Predicate<Update> isReplyToBot() {
         return upd -> upd.getMessage().getReplyToMessage().getFrom().getUserName().equalsIgnoreCase(getBotUsername());
-    }
+      }
 
-    public Ability sayHelloWorld() {
-        return Ability
-                .builder()
-                .name("hello")
-                .info("says hello world!")
-                .input(0)
-                .locality(USER)
-                .privacy(ADMIN)
-                .action(ctx -> silent.send("Hello world!", ctx.chatId()))
-                .post(ctx -> silent.send("Bye world!", ctx.chatId()))
-                .build();
-    }
 
-    //untuk percobaan query db jadi tulis /start <argument apapun>
-    public Ability testingDB() {
-        return Ability
-                .builder()
-                .name("start")
-                .info("says hello world!")
-                .input(0)
-                .locality(USER)
-                .privacy(ADMIN)
-                .action(ctx -> {
+      public Ability sayHelloWorld() {
+
+
+          return Ability
+                    .builder()
+                    .name("hello")
+                    .info("says hello world!")
+                    .input(0)
+                    .locality(USER)
+                    .privacy(ADMIN)
+                    .action(ctx -> silent.send("Hello world!", ctx.chatId()))
+                    .post(ctx -> silent.send("Bye world!", ctx.chatId()))
+                    .build();
+      }
+      // //untuk percobaan query db jadi tulis /start <argument apapun>
+      // public Ability TestingDb()  {
+      //
+      //
+      //     return Ability
+      //               .builder()
+      //               .name("start")
+      //               .info("says hello world!")
+      //               .input(0)
+      //               .locality(USER)
+      //               .privacy(ADMIN)
+      //               .action(ctx ->       {
+      //               //    String rst = "";
+      //                   if(ctx.arguments().length == 0 ){
+      //
+      //                         silent.send("start", ctx.chatId());
+      //                   }
+      //                   else{
+      //                           //open db connection (it is a must before a query)
+      //                           super.openDBConnection();
+      //                           User user = Tables.USER.findFirst("id = ?", 1);
+      //                           silent.send(" "+ user.get("username"), ctx.chatId());
+      //                           //close db
+      //                           super.closeDBConnection();
+      //                   }
+      //
+      //                })
+      //               .build();
+      // }
+
+
+      //start user from
+      public Ability StartingBeforeConfiguration()  {
+
+
+          return Ability
+                    .builder()
+                    .name("start")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(USER)
+                    .action(ctx ->       {
                     //    String rst = "";
-                    if (ctx.arguments().length == 0) {
-                        silent.send("start", ctx.chatId());
-                    } else {
-                        //open db connection (it is a must before a query)
-                        super.openDBConnection();
-                        User user = Tables.USER.findFirst("id = ?", 1);
-                        silent.send(" " + user.get("username"), ctx.chatId());
-                        //close db
-                        super.closeDBConnection();
-                    }
-                })
-                .build();
-    }
+                        if(ctx.arguments().length == 0 ){
 
-    public Ability setRemote() {
+                              super.openDBConnection();
+
+
+                              User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+                                if(user == null){
+                                  user = new User();
+
+                                  user.set("username", ctx.user().username());
+                                  user.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                  user.saveIt();
+
+
+                                  silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+
+                                  silent.send("Untuk menambahkan supervisor kamu, silahkan tulis /addsupervisor1 [@username] atau /addsupervisor2 [@username]", ctx.chatId());
+                                //close db
+                              }
+                              else{
+                                silent.send("Hallo untuk bantuan silahkan ketik /help", ctx.chatId());
+
+
+                              }
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+
+                     })
+                    .build();
+      }
+
+  public Ability StartingBeforeConfigurationGroup()  {
+
+
+          return Ability
+                    .builder()
+                    .name("startgroup")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
+                    .action(ctx ->       {
+                    //    String rst = "";
+                        if(ctx.arguments().length == 0 ){
+
+                              super.openDBConnection();
+
+
+                            //  Group group = Tables.GROUP.findFirst("chat_id = ?",ctx.chatId());
+                                if(true){
+                                //  group = new Group();
+
+                                  //user.set("username", ctx.user().username());
+                              //    group.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                //  group.saveIt();
+
+
+                                  silent.send(""+ctx.chatId(), ctx.chatId());
+
+                                //  silent.send("Untuk menambahkan supervisor kamu, silahkan tulis /addsupervisor1 [@username] atau /addsupervisor2 [@username]", ctx.chatId());
+                                //close db
+                              }
+                              else{
+                                silent.send("Notifikasi cuti/remote/sakit telah di set di group ini sebelumnya", ctx.chatId());
+
+
+                              }
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+
+                     })
+                    .build();
+      }
+  
+      public Ability setRemote() {
       // arg 1 = tanggal
       // arg 2 = alasan
         return Ability
@@ -224,6 +330,57 @@ public class HelloBot extends BaseBot {
                 .build();
     }
 
+  //start user from
+      public Ability ConfigurationSupervisor1()  {
+
+
+          return Ability
+                    .builder()
+                    .name("addsupervisor1")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
+                    .action(ctx ->       {
+                    //    String rst = "";
+                        if(ctx.arguments().length == 1 ){
+
+                              super.openDBConnection();
+
+
+                              User supervisor = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+                              if(supervisor == null){
+                                silent.send("Username "+ ctx.firstArg()+" belum menambahkan bot ini, mohon informasikan dia untuk menambahkan bot ini sebelum ditambahkan untuk notifikasi kamu", ctx.chatId());
+                              }
+                              else{
+                                  User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+
+
+                                  user.set("supervisor1_id", supervisor.get("id"));
+                        //          user.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                  user.saveIt();
+
+
+                              //    silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+                                  silent.send("Supervisor 1 kamu yakni @"+ ctx.firstArg()+" berhasil ditambahkan, silahkan tulis /addsupervisor2 untuk menambahkan supervisor 2", ctx.chatId());
+                                //close db
+                              }
+
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+                        else{
+                          silent.send("Salah komentar, seharusnya  /addsupervisor1 [@username]", ctx.chatId());
+
+                        }
+
+                     })
+                    .build();
+      }
+  
     //blm
     public Ability setSakit() {
       // arg 1 = tanggal
@@ -300,5 +457,145 @@ public class HelloBot extends BaseBot {
         } catch (ParseException e) {
             return null;
         }
+    }
+
+                            
+      public Ability ConfigurationSupervisor2()  {
+
+
+          return Ability
+                    .builder()
+                    .name("addsupervisor2")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
+                    .action(ctx ->       {
+                    //    String rst = "";
+                        if(ctx.arguments().length == 1 ){
+                              super.openDBConnection();
+
+
+                              User supervisor = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+                              if(supervisor == null){
+                                silent.send("Username "+ ctx.firstArg()+" belum menambahkan bot ini, mohon informasikan dia untuk menambahkan bot ini sebelum ditambahkan untuk notifikasi kamu", ctx.chatId());
+                              }
+                              else{
+                                  User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+
+
+                                  user.set("supervisor2_id", supervisor.get("id"));
+                        //          user.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                  user.saveIt();
+
+
+                              //    silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+                                  silent.send("Supervisor 2 kamu yakni @"+ ctx.firstArg()+" berhasil ditambahkan, silahkan tulis /addsupervisor1 untuk menambahkan supervisor 2", ctx.chatId());
+                                //close db
+                              }
+
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+                        else{
+                          silent.send("Salah komentar, seharusnya  /addsupervisor1 [@username]", ctx.chatId());
+
+                        }
+
+                     })
+                    .build();
+      }
+
+      public Ability historyByUsername()  {
+        return Ability
+          .builder()
+          .name("historyByUsername")
+          .info("Lihat semua riwayat status dari seorang user")
+          .input(1)
+          .locality(ALL)
+          .privacy(PUBLIC)
+          .action(ctx ->       {
+            String arg = ctx.firstArg();
+
+              super.openDBConnection();
+              User user = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+
+              if(user != null){
+
+                  int userID = Integer.parseInt(user.get("id").toString());
+                  List<History> history = Tables.HISTORY.where("user_id = ?", userID);
+
+                  if(history.size() > 0){
+                      String finalString = "Hai kaka, berikut riwayat status si " + arg + " : \n";
+                    for(int i = 0; i < history.size(); i++) {
+                      String tanggal = history.get(i).get("tanggal").toString();
+                      String status = history.get(i).get("status").toString();
+                      Object alasanObj = history.get(i).get("reason");
+                      String alasan = "";
+                      if(alasanObj != null){
+                        alasan = history.get(i).get("reason").toString();
+                      }
+                      finalString += "tanggal : " + tanggal + ", status : "+ status + ", alasan : " + alasan +"\n";
+                    }
+                    silent.send(finalString, ctx.chatId());
+                  }
+                  else{
+                    silent.send("History apapun belum ada", ctx.chatId());
+
+                  }
+
+                //close db
+                super.closeDBConnection();
+            } else{
+              silent.send("Username " + arg + " tidak terdaftar", ctx.chatId());
+            }
+          }).build();
+      }
+
+      public Ability historyByTanggal()  {
+        return Ability
+          .builder()
+          .name("historyByTanggal")
+          .info("Lihat semua riwayat status pada tanggal tertentu")
+          .input(1)
+          .locality(ALL)
+          .privacy(PUBLIC)
+          .action(ctx ->       {
+            try {
+              String arg = ctx.secondArg();
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+              LocalDate date = LocalDate.parse(arg, formatter);
+              super.openDBConnection();
+              List<History> history = Tables.HISTORY.where("tanggal = ?", date);
+              String finalString = "";
+              if (history.size() > 0) {
+                finalString = "Hai kaka, berikut riwayat status pada tanggal " + arg + " : \n";
+
+                for(int i = 0; i < history.size(); i++) {
+                  int id = Integer.parseInt(history.get(i).get("user_id").toString());
+                  String username = Tables.USER.findFirst("id = ?", id).get("username").toString();
+                  String status = history.get(i).get("status").toString();
+                  String alasan = "";
+                  try {
+                    alasan = history.get(i).get("reason").toString();
+                  } catch (NullPointerException e) {
+
+                  }
+                  finalString += "username : @" + username + ", status : " + status + ", alasan : " + alasan +"\n";
+                }
+              } else {
+                finalString = "Hai kaka, pada tanggal " + arg + " semuanya masuk nih";
+              }
+              silent.send(finalString, ctx.chatId());
+            } catch (DateTimeParseException e) {
+              silent.send("Hai kaka, format tanggal salah", ctx.chatId());
+            }
+            super.closeDBConnection();
+          }).build();
+      }
+
     }
 }
