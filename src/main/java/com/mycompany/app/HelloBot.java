@@ -116,8 +116,39 @@ public class HelloBot extends BaseBot {
                     .post(ctx -> silent.send("Bye world!", ctx.chatId()))
                     .build();
       }
-      //untuk percobaan query db jadi tulis /start <argument apapun>
-      public Ability TestingDb()  {
+      // //untuk percobaan query db jadi tulis /start <argument apapun>
+      // public Ability TestingDb()  {
+      //
+      //
+      //     return Ability
+      //               .builder()
+      //               .name("start")
+      //               .info("says hello world!")
+      //               .input(0)
+      //               .locality(USER)
+      //               .privacy(ADMIN)
+      //               .action(ctx ->       {
+      //               //    String rst = "";
+      //                   if(ctx.arguments().length == 0 ){
+      //
+      //                         silent.send("start", ctx.chatId());
+      //                   }
+      //                   else{
+      //                           //open db connection (it is a must before a query)
+      //                           super.openDBConnection();
+      //                           User user = Tables.USER.findFirst("id = ?", 1);
+      //                           silent.send(" "+ user.get("username"), ctx.chatId());
+      //                           //close db
+      //                           super.closeDBConnection();
+      //                   }
+      //
+      //                })
+      //               .build();
+      // }
+
+
+      //start user from
+      public Ability StartingBeforeConfiguration()  {
 
 
           return Ability
@@ -125,30 +156,144 @@ public class HelloBot extends BaseBot {
                     .name("start")
                     .info("says hello world!")
                     .input(0)
-                    .locality(USER)
-                    .privacy(ADMIN)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
                     .action(ctx ->       {
                     //    String rst = "";
                         if(ctx.arguments().length == 0 ){
 
-                              silent.send("start", ctx.chatId());
-                        }
-                        else{
-                                //open db connection (it is a must before a query)
-                                super.openDBConnection();
-                                User user = Tables.USER.findFirst("id = ?", 1);
-                                silent.send(" "+ user.get("username"), ctx.chatId());
+                              super.openDBConnection();
+
+
+                              User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+                                if(user == null){
+                                  user = Tables.USER;
+
+                                  user.set("username", ctx.user().username());
+                                  user.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                  user.saveIt();
+
+
+                                  silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+
+                                  silent.send("Untuk menambahkan supervisor kamu, silahkan tulis /addsupervisor1 [@username] atau /addsupervisor2 [@username]", ctx.chatId());
                                 //close db
-                                super.closeDBConnection();
+                              }
+                              else{
+                                silent.send("Hallo untuk bantuan silahkan ketik /help", ctx.chatId());
+
+
+                              }
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
                         }
 
                      })
                     .build();
       }
 
+      //start user from
+      public Ability ConfigurationSupervisor1()  {
 
 
+          return Ability
+                    .builder()
+                    .name("addsupervisor1")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
+                    .action(ctx ->       {
+                    //    String rst = "";
+                        if(ctx.arguments().length == 1 ){
 
+                              super.openDBConnection();
+
+
+                              User supervisor = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+                              if(supervisor == null){
+                                silent.send("Username "+ ctx.firstArg()+" belum menambahkan bot ini, mohon informasikan dia untuk menambahkan bot ini sebelum ditambahkan untuk notifikasi kamu", ctx.chatId());
+                              }
+                              else{
+                                  User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+
+
+                                  user.set("supervisor1_id", supervisor.get("id"));
+                        //          user.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                  user.saveIt();
+
+
+                              //    silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+                                  silent.send("Supervisor 1 kamu yakni @"+ ctx.firstArg()+" berhasil ditambahkan, silahkan tulis /addsupervisor2 untuk menambahkan supervisor 2", ctx.chatId());
+                                //close db
+                              }
+
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+                        else{
+                          silent.send("Salah komentar, seharusnya  /addsupervisor1 [@username]", ctx.chatId());
+
+                        }
+
+                     })
+                    .build();
+      }
+      public Ability ConfigurationSupervisor2()  {
+
+
+          return Ability
+                    .builder()
+                    .name("addsupervisor2")
+                    .info("says hello world!")
+                    .input(0)
+                    .privacy(PUBLIC)
+                    .locality(ALL)
+                    .action(ctx ->       {
+                    //    String rst = "";
+                        if(ctx.arguments().length == 1 ){
+
+                              super.openDBConnection();
+
+
+                              User supervisor = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+                              if(supervisor == null){
+                                silent.send("Username "+ ctx.firstArg()+" belum menambahkan bot ini, mohon informasikan dia untuk menambahkan bot ini sebelum ditambahkan untuk notifikasi kamu", ctx.chatId());
+                              }
+                              else{
+                                  User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+
+
+                                  user.set("supervisor2_id", supervisor.get("id"));
+                        //          user.set("chat_id",  ctx.chatId());
+                            //    user.set("dob", "1935-12-06");
+                                  user.saveIt();
+
+
+                              //    silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+                                  silent.send("Supervisor 2 kamu yakni @"+ ctx.firstArg()+" berhasil ditambahkan, silahkan tulis /addsupervisor1 untuk menambahkan supervisor 2", ctx.chatId());
+                                //close db
+                              }
+
+                              super.closeDBConnection();
+
+
+                            //  silent.send("start", ctx.chatId());
+                        }
+                        else{
+                          silent.send("Salah komentar, seharusnya  /addsupervisor1 [@username]", ctx.chatId());
+
+                        }
+
+                     })
+                    .build();
+      }
 
 
 }
