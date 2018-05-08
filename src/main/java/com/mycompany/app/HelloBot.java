@@ -214,9 +214,9 @@ public class HelloBot extends BaseBot {
                               super.openDBConnection();
 
 
-                              Group group = Tables.GROUP.findFirst("chat_id = ?",ctx.chatId());
-                                if(group == null){
-                                  group = new Group();
+                            //  Group group = Tables.GROUP.findFirst("chat_id = ?",ctx.chatId());
+                                if(true){
+                                //  group = new Group();
 
                                   //user.set("username", ctx.user().username());
                               //    group.set("chat_id",  ctx.chatId());
