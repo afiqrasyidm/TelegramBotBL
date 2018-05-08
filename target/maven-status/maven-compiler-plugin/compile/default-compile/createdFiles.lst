@@ -1,6 +1,7 @@
 com\mycompany\app\BaseBot.class
 com\mycompany\app\Tables.class
 com\mycompany\app\Tables$Group.class
+com\mycompany\app\jobs\BroadcastJob.class
 com\mycompany\app\Tables$History.class
 com\mycompany\app\HelloBot.class
 com\mycompany\app\Tables$User.class

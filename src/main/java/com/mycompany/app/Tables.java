@@ -11,7 +11,6 @@ public class Tables {
     public static class User extends Model {}
     public static final User USER = new User();
 
-
     @Table("hackaton.History")
     public static class History extends Model {}
     public static final History HISTORY = new History();
@@ -19,5 +18,4 @@ public class Tables {
     @Table("hackaton.Group")
     public static class Group extends Model {}
     public static final Group GROUP = new Group();
-
 }
