@@ -18,13 +18,7 @@ public static final User USER = new User();
 public static class History extends Model {}
 public static final History HISTORY = new History();
 
-<<<<<<< HEAD
-
-
 @Table("hackaton.Group")
 public static class Group extends Model {}
 public static final Group GROUP = new Group();
-
-=======
->>>>>>> c0c8baef5aad930637c1fdd845eab171525a20dc
 }
