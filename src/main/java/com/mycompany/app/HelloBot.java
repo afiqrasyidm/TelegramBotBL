@@ -149,7 +149,7 @@ public class HelloBot extends BaseBot {
       public Ability historyByUsername()  {
         return Ability
           .builder()
-          .name("history_by_username")
+          .name("historyByUsername")
           .info("Lihat semua riwayat status dari seorang user")
           .input(1)
           .locality(ALL)
