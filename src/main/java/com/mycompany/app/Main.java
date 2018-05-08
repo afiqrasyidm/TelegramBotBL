@@ -8,23 +8,19 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
  * Hello world!
  *
  */
-public class Main
-{
-    public static void main( String[] args )throws Exception
-    {
-       ApiContextInitializer.init();
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
 
         // Register our bot
-
         HelloBot hello = new HelloBot();
 
         //hello.openDBConnection();
         try {
-        botsApi.registerBot(hello);
+            botsApi.registerBot(hello);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-
     }
 }

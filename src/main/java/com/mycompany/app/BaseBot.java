@@ -3,14 +3,11 @@ package com.mycompany.app;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.javalite.activejdbc.Base;
-import org.postgresql.Driver;
-
 
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.*;
-
 
 public class BaseBot extends AbilityBot {
     private static Dotenv dotenv = Dotenv.configure().directory("./").ignoreIfMalformed().ignoreIfMissing().load();
@@ -20,8 +17,7 @@ public class BaseBot extends AbilityBot {
       //   Base.open("org.postgresql.Driver", "jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
     }
 
-    public void openDBConnection(){
-
+    public void openDBConnection() {
         Base.open("org.postgresql.Driver", validHost(), validUser(), validPassword());
     }
 
@@ -78,57 +74,35 @@ public class BaseBot extends AbilityBot {
         return Integer.parseInt(creatorId);
     }
 
+    public Statement ConnectToDB() throws Exception {
+        Statement stmt = null;
 
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Where is your PostgreSQL JDBC Driver? " + "Include in your library path!");
+            e.printStackTrace();
+        }
 
+        System.out.println("PostgreSQL JDBC Driver Registered!");
 
+        Connection connection = null;
 
-
-  public Statement ConnecttoDB() throws Exception{
-
-      Statement stmt = null;
-
-
-    try {
-
-      Class.forName("org.postgresql.Driver");
-
-    } catch (ClassNotFoundException e) {
-
-      System.out.println("Where is your PostgreSQL JDBC Driver? "
-          + "Include in your library path!");
-      e.printStackTrace();
-
-
-    }
-
-    System.out.println("PostgreSQL JDBC Driver Registered!");
-
-    Connection connection = null;
-
-    try {
-
-      connection = DriverManager.getConnection(
-           validHost(), validUser(), validPassword());
-
-    } catch (SQLException e) {
-
-      System.out.println("Connection Failed! Check output console");
-      e.printStackTrace();
-
-    }
-
-    if (connection != null) {
-          try {
-             stmt = connection.createStatement();
-          }
-
-          catch (Exception e) {
-
+        try {
+            connection = DriverManager.getConnection(validHost(), validUser(), validPassword());
+        } catch (SQLException e) {
             System.out.println("Connection Failed! Check output console");
             e.printStackTrace();
+        }
 
-          }
-          /*  String sql;
+        if (connection != null) {
+            try {
+                stmt = connection.createStatement();
+            } catch (Exception e) {
+                System.out.println("Connection Failed! Check output console");
+                e.printStackTrace();
+            }
+            /*  String sql;
             sql = "SELECT * FROM hackaton.user";
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -141,15 +115,11 @@ public class BaseBot extends AbilityBot {
                      System.out.print("Username: " + username);
              }
              */
-      System.out.println("You made it, take control your database now!");
-    } else {
-      System.out.println("Failed to make connection!");
+            System.out.println("You made it, take control your database now!");
+        } else {
+            System.out.println("Failed to make connection!");
+        }
+
+        return stmt;
     }
-
-    return stmt ;
-  }
-
-
-
-
 }
