@@ -18,6 +18,14 @@ import org.telegram.telegrambots.api.objects.Update;
 
 import java.text.ParseException;
 import java.util.function.Predicate;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -103,13 +111,13 @@ public class HelloBot extends BaseBot {
 
             super.openDBConnection();
 
-            Group group = Tables.GROUP.findFirst("chat_id = ?",ctx.chatId());
+            Group group = Tables.GROUP.findFirst("chat_id = ?", ctx.chatId());
             if (true) {
               group = new Group();
 
               group.set("nama", ctx.user().username());
               group.set("chat_id", ctx.chatId());
-              //user.set("dob", "1935-12-06");
+              // user.set("dob", "1935-12-06");
               group.saveIt();
 
               // silent.send("" + ctx.chatId(), ctx.chatId());
@@ -176,11 +184,12 @@ public class HelloBot extends BaseBot {
             job.getJobDataMap().put("USER_ID", ctx.user().id());
             job.getJobDataMap().put("ACTION", "remote");
 
-            Date targetTime = formatDate(ctx.firstArg());
+            // Date targetTime = formatDate(ctx.firstArg());
+            Date targetTime = DateUtils.addMinutes(new Date(), 1);
             Trigger trigger = registerTrigger(targetTime, identifier);
 
             try {
-				      queueJob(job, trigger);
+              queueJob(job, trigger);
             } catch (Exception e) {
               // TODO Auto-generated catch block
               e.printStackTrace();
@@ -241,7 +250,7 @@ public class HelloBot extends BaseBot {
             Trigger trigger = registerTrigger(targetTime, identifier);
 
             try {
-				      queueJob(job, trigger);
+              queueJob(job, trigger);
             } catch (Exception e) {
               // TODO Auto-generated catch block
               e.printStackTrace();
@@ -340,7 +349,7 @@ public class HelloBot extends BaseBot {
             Trigger trigger = registerTrigger(targetTime, identifier);
 
             try {
-				      queueJob(job, trigger);
+              queueJob(job, trigger);
             } catch (Exception e) {
               // TODO Auto-generated catch block
               e.printStackTrace();
@@ -465,11 +474,79 @@ public class HelloBot extends BaseBot {
               silent.send("History apapun belum ada", ctx.chatId());
 
             }
-
-            // close db
-            super.closeDBConnection();
           } else {
             silent.send("Username " + arg + " tidak terdaftar", ctx.chatId());
+          }
+          super.closeDBConnection();
+        }).build();
+  }
+
+  public Ability notifySupervisor() {
+    return Ability.builder().name("testnotifysupervisor").info("test feature").input(0).locality(ALL).privacy(PUBLIC)
+        .action(ctx -> {
+          super.openDBConnection();
+          User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+          // System.out.println("USERNAME= ");
+
+          if (user != null) {
+            String strId1 = "";
+            String strId2 = "";
+            try {
+              strId1 = user.get("supervisor1_id").toString();
+            } catch (NullPointerException e) {
+              // TODO: handle exception
+            }
+
+            try {
+              strId2 = user.get("supervisor2_id").toString();
+            } catch (NullPointerException e) {
+              // TODO: handle exception
+            }
+            int supervisor1Id = -1;
+            int supervisor2Id = -1;
+
+            if (strId1 != "") {
+              supervisor1Id = Integer.parseInt(strId1);
+            }
+            if (strId2 != "") {
+              supervisor2Id = Integer.parseInt(strId2);
+            }
+
+            int[] supervisorIds = { supervisor1Id, supervisor2Id };
+            int sentStatus = 0;
+            for (int supervisorId : supervisorIds) {
+              if (supervisorId != -1) {
+                User supervisor = Tables.USER.findFirst("id = ?", supervisorId);
+
+                if (supervisor != null) {
+                  String strChatId = "";
+                  try {
+                    strChatId = supervisor.get("chat_id").toString();
+                    ;
+                  } catch (Exception e) {
+                    // TODO: handle exception
+                  }
+
+                  int chatId = -1;
+                  if (strChatId != "") {
+                    chatId = Integer.parseInt(strChatId);
+                  }
+                  if (chatId != -1) {
+                    silent.send(
+                        "you've been notified because your position as supervisor for @" + ctx.user().username(),
+                        chatId);
+                    sentStatus += 1;
+                  } else {
+                    silent.send("chatId not found", ctx.chatId());
+                  }
+                }
+              }
+              if (sentStatus == 0) {
+                silent.send("you haven't registered any supervisor yet", ctx.chatId());
+              }
+            }
+          } else {
+            silent.send("your username haven't recorded yet", ctx.chatId());
           }
         }).build();
   }
@@ -509,4 +586,107 @@ public class HelloBot extends BaseBot {
           super.closeDBConnection();
         }).build();
   }
+
+  public Ability historyByUsernameAndTanggal() {
+    return Ability.builder().name("history").info("Lihat semua riwayat status pada tanggal dan username tertentu")
+        .input(2).locality(ALL).privacy(PUBLIC).action(ctx -> {
+          try {
+            super.openDBConnection();
+            String arg1 = ctx.firstArg();
+            String arg2 = ctx.secondArg();
+
+            System.out.println(arg1 + " " + arg2);
+            System.out.println(ctx.firstArg().substring(1));
+
+            User user = Tables.USER.findFirst("username = ?", ctx.firstArg().substring(1));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+            LocalDate date = LocalDate.parse(arg2, formatter);
+
+            if (user != null) {
+              int userID = Integer.parseInt(user.get("id").toString());
+              List<History> history = Tables.HISTORY.where("tanggal = ? AND user_id = ?", date, userID);
+              String finalString = "";
+              if (history.size() > 0) {
+                finalString = "Hai kaka, berikut riwayat status si " + arg1 + " pada tanggal " + arg2 + " : \n";
+
+                for (int i = 0; i < history.size(); i++) {
+                  int id = Integer.parseInt(history.get(i).get("user_id").toString());
+                  String status = history.get(i).get("status").toString();
+                  String alasan = "";
+                  try {
+                    alasan = history.get(i).get("reason").toString();
+                  } catch (NullPointerException e) {
+
+                  }
+                  finalString += "status : " + status + ", alasan : " + alasan + "\n";
+                }
+              } else {
+                finalString = "Hai kaka, pada tanggal " + arg2 + " username " + arg1 + " masuk nih";
+              }
+              silent.send(finalString, ctx.chatId());
+            } else {
+              silent.send("Username " + arg1 + " tidak terdaftar", ctx.chatId());
+            }
+
+          } catch (DateTimeParseException e) {
+            silent.send("Hai kaka, format tanggal salah", ctx.chatId());
+          }
+          super.closeDBConnection();
+        }).build();
+  }
+
+  public int[] getSupervisorChatId(String username)  {
+      int[] supervisorChatIds = {-1,-1};
+      User user = Tables.USER.findFirst("username = ?", username);
+
+      if(user != null) {
+        String strId1 = "";
+        String strId2 = "";
+        try {
+          strId1 = user.get("supervisor1_id").toString();
+        } catch (NullPointerException e) {
+          //TODO: handle exception
+        }
+
+        try {
+          strId2 = user.get("supervisor2_id").toString();
+        } catch (NullPointerException e) {
+          //TODO: handle exception
+        }
+        int supervisor1Id = -1;
+        int supervisor2Id = -1;
+
+        if(strId1 != "") {
+          supervisor1Id = Integer.parseInt(strId1);
+        }
+        if(strId2 != "") {
+          supervisor2Id = Integer.parseInt(strId2);
+        }
+
+        int[] supervisorIds = {supervisor1Id, supervisor2Id};
+        int chatIdsIdx = 0;
+        for(int supervisorId : supervisorIds) {
+          if(supervisorId != -1) {
+            User supervisor = Tables.USER.findFirst("id = ?", supervisorId);
+
+            if(supervisor != null) {
+              String strChatId = "";
+              try {
+                strChatId = supervisor.get("chat_id").toString();;
+              } catch (Exception e) {
+                //TODO: handle exception
+              }
+
+              int chatId = -1;
+              if(strChatId != "") {
+                chatId = Integer.parseInt(strChatId);
+              }
+              supervisorChatIds[chatIdsIdx] = chatId;
+              chatIdsIdx ++;
+            }
+          }
+        }
+      }
+      return supervisorChatIds;
+    }
 }
