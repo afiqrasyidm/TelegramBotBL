@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.text.DateFormat;
@@ -167,7 +168,7 @@ public class HelloBot extends BaseBot {
 
                               User user = Tables.USER.findFirst("username = ?", ctx.user().username());
                                 if(user == null){
-                                  user = Tables.USER;
+                                  user = new User();
 
                                   user.set("username", ctx.user().username());
                                   user.set("chat_id",  ctx.chatId());
@@ -337,6 +338,77 @@ public class HelloBot extends BaseBot {
           }).build();
       }
 
+      public Ability notifySupervisor()  {
+        return Ability
+          .builder()
+          .name("testnotifysupervisor")
+          .info("test feature")
+          .input(0)
+          .locality(ALL)
+          .privacy(PUBLIC)
+          .action(ctx ->       {
+            super.openDBConnection();
+            User user = Tables.USER.findFirst("username = ?", ctx.user().username());
+            // System.out.println("USERNAME= ");
 
+            if(user != null) {
+              String strId1 = "";
+              String strId2 = "";
+              try {
+                strId1 = user.get("supervisor1_id").toString();
+              } catch (NullPointerException e) {
+                //TODO: handle exception
+              }
 
+              try {
+                strId2 = user.get("supervisor2_id").toString();
+              } catch (NullPointerException e) {
+                //TODO: handle exception
+              }
+              int supervisor1Id = -1;
+              int supervisor2Id = -1;
+
+              if(strId1 != "") {
+                supervisor1Id = Integer.parseInt(strId1);
+              }
+              if(strId2 != "") {
+                supervisor2Id = Integer.parseInt(strId2);
+              }
+              
+              int[] supervisorIds = {supervisor1Id, supervisor2Id};
+              int sentStatus = 0;
+              for(int supervisorId : supervisorIds) {
+                if(supervisorId != -1) {
+                  User supervisor = Tables.USER.findFirst("id = ?", supervisorId);
+
+                  if(supervisor != null) {
+                    String strChatId = "";
+                    try {
+                      strChatId = supervisor.get("chat_id").toString();;  
+                    } catch (Exception e) {
+                      //TODO: handle exception
+                    }
+                    
+                    int chatId = -1;
+                    if(strChatId != "") {
+                      chatId = Integer.parseInt(strChatId);
+                    }
+                    if(chatId != -1) {
+                      silent.send("you've been notified because your position as supervisor for @" + ctx.user().username(), chatId);
+                      sentStatus += 1;
+                    } else {
+                      silent.send("chatId not found", ctx.chatId());
+                    }
+                  } 
+                }
+                if(sentStatus == 0) {
+                  silent.send("you haven't registered any supervisor yet", ctx.chatId());
+                }
+              }  
+            } else {
+              silent.send("your username haven't recorded yet", ctx.chatId());
+            }
+            super.closeDBConnection();
+          }).build();
+      }
     }
