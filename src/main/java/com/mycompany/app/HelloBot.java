@@ -358,16 +358,19 @@ public class HelloBot extends BaseBot {
               if(user != null){
 
                   int userID = Integer.parseInt(user.get("id").toString());
-                  List<History> history = Tables.HISTORY.where("id = ?", userID);
+                  List<History> history = Tables.HISTORY.where("user_id = ?", userID);
 
                   if(history.size() > 0){
                       String finalString = "Hai kaka, berikut riwayat status si " + arg + " : \n";
                     for(int i = 0; i < history.size(); i++) {
                       String tanggal = history.get(i).get("tanggal").toString();
                       String status = history.get(i).get("status").toString();
-                      String alasan = history.get(i).get("reason").toString();
+                      Object alasanObj = history.get(i).get("reason");
+                      String alasan = "";
+                      if(alasanObj != null){
+                        alasan = history.get(i).get("reason").toString();
+                      }
                       finalString += "tanggal : " + tanggal + ", "+ status + " dengan alasan " + alasan +"\n";
-
                     }
                     silent.send(finalString, ctx.chatId());
                   }
