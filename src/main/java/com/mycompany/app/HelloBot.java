@@ -195,8 +195,6 @@ public class HelloBot extends BaseBot {
                     .build();
       }
 
-
-      //start user from
       public Ability StartingBeforeConfigurationGroup()  {
 
 
