@@ -1,5 +1,6 @@
 package com.mycompany.app;
 
+import javafx.scene.control.Tab;
 import org.telegram.abilitybots.api.objects.Ability;
 
 import org.telegram.abilitybots.api.sender.SilentSender;
@@ -24,6 +25,10 @@ import java.sql.*;
 
 public class HelloBot extends BaseBot {
     private Statement stmt;
+
+    private final String REMOTE = "remote";
+    private final String CUTI = "cuti";
+    private final String SAKIT = "sakit";
 
     public HelloBot() throws Exception {
         super();
@@ -139,12 +144,24 @@ public class HelloBot extends BaseBot {
                         String username = ctx.user().username();
                         User user = Tables.USER.findFirst("username = ?", username);
 
-                        History record = new History();
-                        record.set("user_id", user.get("id"))
-                                .set("status", "remote")
-                                .set("tanggal", newDate)
-                                .set("reason", alasan);
-                        record.saveIt();
+                        if (user != null) {
+                            History history = Tables.HISTORY.findFirst(
+                                    "user_id = ? AND tanggal = ? AND status = ?",
+                                    user.get("id"),
+                                    newDate,
+                                    REMOTE);
+
+                            if (history != null) {
+                                History record = new History();
+                                record.set("user_id", user.get("id"))
+                                        .set("status", REMOTE)
+                                        .set("tanggal", newDate)
+                                        .set("reason", alasan);
+                                record.saveIt();
+                            } else {
+                                silent.send("Kamu sudah mengajukan " + REMOTE + " di tanggal " + tanggal, ctx.chatId());
+                            }
+                        }
 
                         closeDBConnection();
                     } else {
@@ -175,11 +192,23 @@ public class HelloBot extends BaseBot {
                         String username = ctx.user().username();
                         User user = Tables.USER.findFirst("username = ?", username);
 
-                        History record = new History();
-                        record.set("user_id", user.get("id"))
-                                .set("status", "cuti")
-                                .set("tanggal", newDate);
-                        record.saveIt();
+                        if (user != null) {
+                            History history = Tables.HISTORY.findFirst(
+                                    "user_id = ? AND tanggal = ? AND status = ?",
+                                    user.get("id"),
+                                    newDate,
+                                    CUTI);
+
+                            if (history != null) {
+                                History record = new History();
+                                record.set("user_id", user.get("id"))
+                                        .set("status", CUTI)
+                                        .set("tanggal", newDate);
+                                record.saveIt();
+                            } else {
+                                silent.send("Kamu sudah mengajukan " + CUTI + " di tanggal " + tanggal, ctx.chatId());
+                            }
+                        }
 
                         closeDBConnection();
                     } else {
@@ -210,11 +239,23 @@ public class HelloBot extends BaseBot {
                         String username = ctx.user().username();
                         User user = Tables.USER.findFirst("username = ?", username);
 
-                        History record = new History();
-                        record.set("user_id", user.get("id"))
-                                .set("status", "sakit")
-                                .set("tanggal", newDate);
-                        record.saveIt();
+                        if (user != null) {
+                            History history = Tables.HISTORY.findFirst(
+                                    "user_id = ? AND tanggal = ? AND status = ?",
+                                    user.get("id"),
+                                    newDate,
+                                    SAKIT);
+
+                            if (history != null) {
+                                History record = new History();
+                                record.set("user_id", user.get("id"))
+                                        .set("status", SAKIT)
+                                        .set("tanggal", newDate);
+                                record.saveIt();
+                            } else {
+                                silent.send("Kamu sudah mengajukan " + SAKIT + " di tanggal " + tanggal, ctx.chatId());
+                            }
+                        }
 
                         closeDBConnection();
                     } else {
