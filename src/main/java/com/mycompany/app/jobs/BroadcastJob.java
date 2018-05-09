@@ -22,6 +22,7 @@ public class BroadcastJob implements Job {
 	public static final String END_DATE = "END_DATE";
 	public static final String ACTION = "ACTION";
 	public static final String USER_ID = "USER_ID";
+		public static final String USERNAME = "USERNAME";
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		JobDataMap dataMap = context.getJobDetail().getJobDataMap();
@@ -62,10 +63,10 @@ public class BroadcastJob implements Job {
 
 	private String buildMessage(JobDataMap dataMap) {
 		String action = dataMap.getString(ACTION);
-		String message = "Teman - teman, hari ini saya izin " + action + " dulu";
+		String message = "Teman - teman, hari ini @"+ dataMap.getString(USERNAME) +" izin " + action + " dulu";
 		if (action.equals("remote")) {
 			message += " karena " + dataMap.getString(REASON)
-					+ ". Jika ada masalah yang terkait dengan pekerjaan saya, silahkan kontak saya langsung melalui telegram :)";
+					+ ". Jika ada masalah yang terkait dengan dirinya, silahkan kontak saya langsung melalui telegram :)";
 			;
 		} else if (action.equals("cuti")) {
 			message += " hingga tanggal " + dataMap.getString(END_DATE) + ".";

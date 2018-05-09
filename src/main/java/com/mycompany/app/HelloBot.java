@@ -84,7 +84,7 @@ public class HelloBot extends BaseBot {
               // user.set("dob", "1935-12-06");
               user.saveIt();
 
-              silent.send("Hallo selamat menambahkan Bot!", ctx.chatId());
+              silent.send("Hallo selamat datang!", ctx.chatId());
 
               silent.send(
                   "Untuk menambahkan supervisor kamu, silahkan tulis /addsupervisor1 [@username] atau /addsupervisor2 [@username]",
@@ -112,7 +112,7 @@ public class HelloBot extends BaseBot {
             super.openDBConnection();
 
             Group group = Tables.GROUP.findFirst("chat_id = ?", ctx.chatId());
-            if (true) {
+            if (group == null) {
               group = new Group();
 
               group.set("nama", ctx.user().username());
@@ -121,6 +121,8 @@ public class HelloBot extends BaseBot {
               group.saveIt();
 
               // silent.send("" + ctx.chatId(), ctx.chatId());
+              silent.send("Notifikasi cuti/remote/sakit telah di set di group ini yaa", ctx.chatId());
+
 
               // silent.send("Untuk menambahkan supervisor kamu, silahkan tulis
               // /addsupervisor1 [@username] atau /addsupervisor2 [@username]", ctx.chatId());
@@ -140,7 +142,7 @@ public class HelloBot extends BaseBot {
   public Ability setRemote() {
     // arg 1 = tanggal
     // arg 2 = alasan
-    return Ability.builder().name("remote").info("Set status menjadi remote").input(0).locality(USER).privacy(PUBLIC)
+    return Ability.builder().name("remote").info("Set status menjadi remote").input(0).locality(ALL).privacy(PUBLIC)
         .action(ctx -> {
           String tanggal = ctx.firstArg();
           String alasan = ctx.secondArg();
@@ -161,6 +163,8 @@ public class HelloBot extends BaseBot {
 
               if (history == null) {
                 History record = new History();
+                silent.send("Kamu  mengajukan " + REMOTE + " di tanggal " + tanggal + ", ini di notif ke supervisor kakak ya", ctx.chatId());
+
                 record.set("user_id", user.get("id")).set("status", REMOTE).set("tanggal", newDate).set("reason",
                     alasan);
                 record.saveIt();
@@ -198,6 +202,7 @@ public class HelloBot extends BaseBot {
             job.getJobDataMap().put("REASON", message);
             job.getJobDataMap().put("CHAT_IDS", ids);
             job.getJobDataMap().put("USER_ID", ctx.user().id());
+            job.getJobDataMap().put("USERNAME", ctx.user().username());
             job.getJobDataMap().put("ACTION", "remote");
 
             // Date targetTime = formatDate(ctx.firstArg());
@@ -222,7 +227,7 @@ public class HelloBot extends BaseBot {
   // blm
   public Ability setCuti() {
     // arg 1 = tanggal
-    return Ability.builder().name("cuti").info("Set status menjadi cuti").input(2).locality(USER).privacy(PUBLIC)
+    return Ability.builder().name("cuti").info("Set status menjadi cuti").input(2).locality(ALL).privacy(PUBLIC)
         .action(ctx -> {
           String tanggalMulai = ctx.firstArg();
           String tanggalSelesai = ctx.secondArg();
@@ -241,6 +246,9 @@ public class HelloBot extends BaseBot {
 
               if (history == null) {
                 History record = new History();
+
+                silent.send("Kamu sudah mengajukan " + CUTI + " di tanggal " + newDateMulai+ ", ini di notif ke supervisor kakak ya", ctx.chatId());
+
                 record.set("user_id", user.get("id")).set("status", CUTI).set("tanggal", newDateMulai);
                 record.saveIt();
               } else {
@@ -260,7 +268,7 @@ public class HelloBot extends BaseBot {
             }
             if(sentStatus == -1) {
               silent.send("Halo, kaka!" + "\n"
-                            + "Kamu belum ngedaftarin supervisor nih", ctx.chatId());
+                            + "Kamu rupanya belum ngedaftarin supervisor nih", ctx.chatId());
             }
 
             List<Group> chatIds = Tables.GROUP.findAll();
@@ -338,7 +346,7 @@ public class HelloBot extends BaseBot {
   // blm
   public Ability setSakit() {
     // arg 1 = tanggal
-    return Ability.builder().name("sakit").info("Set status menjadi sakit").input(1).locality(USER).privacy(PUBLIC)
+    return Ability.builder().name("sakit").info("Set status menjadi sakit").input(1).locality(ALL).privacy(PUBLIC)
         .action(ctx -> {
           String tanggal = ctx.firstArg();
           if (dateIsValid(tanggal)) {
@@ -355,6 +363,8 @@ public class HelloBot extends BaseBot {
 
               if (history == null) {
                 History record = new History();
+                silent.send("Kamu mengajukan " + SAKIT + " di tanggal " + tanggal+ ", ini langsung di notif ke supervisor kakak ya ", ctx.chatId());
+
                 record.set("user_id", user.get("id")).set("status", SAKIT).set("tanggal", newDate);
                 record.saveIt();
               } else {
@@ -362,7 +372,7 @@ public class HelloBot extends BaseBot {
               }
             }
 
-            
+
             int[] chatIdsint = getSupervisorChatId(username);
             int sentStatus = -1;
             for(int id : chatIdsint) {
@@ -631,6 +641,46 @@ public class HelloBot extends BaseBot {
             silent.send("Hai kaka, format tanggal salah", ctx.chatId());
           }
           super.closeDBConnection();
+        }).build();
+  }
+  public Ability help() {
+    return Ability.builder().name("help").info("untuk help").input(0)
+        .locality(ALL).privacy(PUBLIC).action(ctx -> {
+
+
+
+          String help = "Berikut adalah command yang bisa digunakan di group ini:"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /start untuk perintah awal, sehingga menambahkan kamu ke dalam layanan bot ini."
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /addsupervisor1 [@username] atau /addsupervisor2 [@username] untuk menambahkan supervisor kamu yang nantinya akan mendapatkan notifkasi jika kamu mengajukan cuti/sakit/remote"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /startgroup di dalam group sehingga group kamu akan mendapatkan notifkasi siapa yang cuti/sakit/remote setiap harinya"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /remote [tanggal] [alasan] untuk mengajukan remote di tanggal tertentu beserta alasannya Contoh: /remote 31-01-2019 mengambil raport anak"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /cuti [tanggal mulai] [tanggal selesai] untuk mengajukan cuti mulai dari tanggal tertentu sampai tanggal selesai Contoh: /cuti 01-12-2018 05-12-2018"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /sakit [tanggal] untuk mengajukan sick leave di tanggal tertentu Contoh: /sakit 09-10-2020"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /historybyusername [username] untuk mengajukan riwayat status dari username tertentu Contoh: /historybyusername @afiqrasyid"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /historybytanggal yyyy-MM-dd untuk melihat riwayat status pada tanggal tertentu Contoh: /historybytanggal 2009-01-09"
+                        +"\n"
+                        +"\n"+
+                        "Gunakan /history [username] yyyy-MM-dd untuk melihat riwayat status pada username dan tanggal tertentu Contoh: /history @faisalmazid 2009-01-09"
+                        ;
+
+            silent.send(help, ctx.chatId());
+
         }).build();
   }
 
